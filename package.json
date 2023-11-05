@@ -1,6 +1,6 @@
 {
   "name": "wtc-simplegl",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A bare bones webgl library that provides the most basic setup possible with as little opinion as possible.",
   "main": "lib/index.js",
   "directories": {
