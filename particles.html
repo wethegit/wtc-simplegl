@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Undulations</title>
+    <style>
+body {
+  background: #333;
+  color: #fff;
+  font-family: sans-serif;
+}
+body,
+html {
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+}
+canvas { width:100%; height: 100%; }
+
+    </style>
+  </head>
+  <body>
+    <script type="module" src="./pub/particles.js"></script>
+    <script type="x-shader/x-vertex" id="vert">#version 300 es
+
+      layout(location=0) in float a_id;
+      layout(location=1) in vec2 a_something;
+      layout(location=5) in vec3 a_position;
+      
+      out vec3 v_position;
+      out float v_id;
+      out vec2 v_something;
+      out vec3 lp;
+      
+      uniform vec2 u_resolution;
+      uniform mat4 u_viewMatrix;
+      uniform mat4 u_viewProjectionMatrix;
+      uniform mat4 u_modelViewMatrix;
+      uniform float u_time;
+      
+      void main() {
+        float id = a_id*200.;
+        v_position = a_position;
+        v_id = a_id;
+        v_something = a_something;
+        vec3 p = a_position + vec3(cos(u_time+id)*.2, sin(u_time+id)*.2, 0);
+        
+        float m = length(u_resolution)/1000.;
+        
+        
+        vec4 position = u_viewProjectionMatrix * vec4(p, 1.);
+        
+        
+        mat3 viewmat = mat3(u_viewMatrix);
+        vec3 lightWorldPosition = vec3(50, 100, 50);  // The world space position of the light
+        vec3 viewSpacePos = viewmat * p;  // Transform to view space
+        vec3 lightViewPosition = viewmat * lightWorldPosition;  // Transform to view space
+        lp = normalize(lightViewPosition - viewSpacePos);  // Direction from point to light in view space
+      
+        // lp = normalize((u_viewProjectionMatrix * vec4((p - vec3(20,20,0)), 1)).xyz);
+        
+        // gl_PointSize = 200.*a_something.x*(1./position.w)*m;
+        
+        
+        // Calculate scale factor based on FOV and aspect ratio
+        float scaleFactor = tan(0.7853981633974483 / 2.0) * 2.0;
+        float particleSize = .2; // Set your base particle size here
+      
+        // Adjust gl_PointSize based on FOV, aspect ratio, and distance to camera
+        gl_PointSize = particleSize * a_something.x * (u_resolution.y / scaleFactor) / position.w;
+        
+        
+        
+        
+        gl_Position = position;
+      }
+      </script>
+      <script type="x-shader/x-fragment" id="frag">#version 300 es
+      precision highp float;
+        
+      in float v_id;
+      in vec3 lp;
+      
+      out vec4 color;
+      
+      uniform mat4 u_iViewMatrix;
+      uniform vec2 u_resolution;
+      uniform float u_time;
+      
+      void main() {
+        vec2 uv = gl_PointCoord.xy - .5;
+        
+        float d = length(uv);
+        
+        float opacity = clamp(smoothstep(.5, 0.48, d), 0., 1.);
+        
+        if(opacity < .1) discard;
+        
+          // vec3 normal = normalize(vec3(uv * sqrt(1.0 - d * d), 1.));
+        vec3 normal = vec3( gl_PointCoord.x - .5, .5 - gl_PointCoord.y, 1.0 );
+      normal = normalize( normal );
+      // normal = normal * 0.5 + 0.5;
+          // Calculate the light effect
+          float diffuse = max(dot(normal, lp), 0.0);
+          float lighting = min(.9, .3 + diffuse);
+          
+        color = vec4(vec3(lighting+.1)*(.2+.8*smoothstep(.1, 1., v_id)), 1.); // Using v_id as some basic ambient occlusion
+        // color = vec4(1);
+      }
+      </script>
+        
+  </body>
+</html>
