@@ -2,12 +2,14 @@
   "name": "wtc-simplegl",
   "version": "1.0.3",
   "description": "A bare bones webgl library that provides the most basic setup possible with as little opinion as possible.",
+  "type": "module",
   "main": "lib/index.js",
-  "directories": {
-    "lib": "lib"
-  },
+  "files": [
+    "lib"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --input-type=module -e \"const m = await import('./lib/index.js'); if (Object.keys(m).length === 0) throw new Error('lib/index.js exports nothing');\"",
+    "changeset": "changeset"
   },
   "repository": {
     "type": "git",
@@ -18,10 +20,13 @@
     "simple",
     "boilerplate"
   ],
-  "author": "\"Liam Egan <liam@wethecollective.com> (http://wethecollective.com)",
+  "author": "Liam Egan <liam@wethecollective.com> (http://wethecollective.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/wethegit/wtc-simplegl/issues"
   },
-  "homepage": "https://github.com/wethegit/wtc-simplegl#readme"
+  "homepage": "https://github.com/wethegit/wtc-simplegl#readme",
+  "devDependencies": {
+    "@changesets/cli": "^3.0.3"
+  }
 }
