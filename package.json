@@ -1,14 +1,17 @@
 {
   "name": "wtc-simplegl",
   "version": "1.0.3",
-  "description": "A bare bones webgl library that provides the most basic setup possible with as little opinion as possible.",
+  "description": "A small WebGL2 helper library that cuts down boilerplate, usable from npm or as a single copy-paste file.",
   "type": "module",
   "main": "lib/index.js",
   "files": [
-    "lib"
+    "lib",
+    "dist"
   ],
   "scripts": {
     "test": "node --input-type=module -e \"const m = await import('./lib/index.js'); if (Object.keys(m).length === 0) throw new Error('lib/index.js exports nothing');\"",
+    "build": "node scripts/build.js",
+    "prepack": "npm run build",
     "changeset": "changeset"
   },
   "repository": {
