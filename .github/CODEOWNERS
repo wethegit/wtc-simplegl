@@ -1,0 +1,5 @@
+# Request review from the developers team on the files Dependabot updates.
+# (Replaces the removed `reviewers` option in dependabot.yml.)
+/package.json        @wethegit/developers
+/package-lock.json   @wethegit/developers
+/.github/workflows/  @wethegit/developers
