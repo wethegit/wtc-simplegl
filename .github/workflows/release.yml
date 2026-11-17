@@ -86,6 +86,9 @@ jobs:
 
       - run: npm test
 
+      # Also runs as prepack; built explicitly in case packing skips lifecycle scripts.
+      - run: npm run build
+
       - name: Pack packages
         id: pack
         uses: changesets/action/pack@v2
@@ -115,3 +118,14 @@ jobs:
         with:
           pack-dir-artifact-id: ${{ needs.pack.outputs.pack-dir-artifact-id }}
           create-github-releases: true
+
+      # Attach the copy-paste build to the GitHub release.
+      - run: npm run build
+      - name: Upload simplegl.js to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$(node -p "require('./package.json').version")"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release upload "$tag" dist/simplegl.js --clobber
+          fi
