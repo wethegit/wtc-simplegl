@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Smoke test the entry point
+        run: npm test
+
+      - name: Show what would be published
+        run: npm pack --dry-run
+
+      # npm pack ran the build (prepack); check it matches lib/.
+      - name: Check the single-file build
+        run: >-
+          node --input-type=module -e "
+          const lib = Object.keys(await import('./lib/index.js')).join();
+          const dist = Object.keys(await import('./dist/simplegl.js')).join();
+          if (lib !== dist) throw new Error('dist/simplegl.js exports ' + dist + ', lib/index.js exports ' + lib);"
