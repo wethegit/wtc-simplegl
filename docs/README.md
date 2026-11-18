@@ -11,6 +11,7 @@ The docs have their own `package.json`; run `npm ci --prefix docs` once to insta
 
 - Guides are Markdown pages in the section folders (`getting-started/`, `core/`, `cookbook/` and so on). The sidebar is in `.vitepress/config.mts`.
 - Every demo lives in the docs, as a live example on a cookbook page. There's no separate demos site.
+- `api/` is generated from the JSDoc in `lib/` by TypeDoc (`npm run api`, run by `dev` and `build`) and isn't committed. The build fails on an undocumented export.
 - Live examples are modules in `examples/`, shown with `<Example>`. They import `wtc-simplegl`, which points at `../lib/index.js`, so they always run against the current source.
 
 ## Writing a page
@@ -29,6 +30,14 @@ Then explain the idea in a paragraph or two, show it working, and work through t
 - Code is complete enough to paste: imports, then the setup. Use the library's real names and options; check them against `lib/` rather than memory.
 - Link to other pages by path, without the extension: `[Uniforms](/core/uniforms)`. Only link to pages that exist; the build fails on dead links.
 - Use `::: tip` and `::: warning` containers sparingly, for things that trip people up.
+
+## The API reference
+
+Every export needs a JSDoc comment, and so does every parameter and property TypeDoc can see:
+
+- Functions: a description, `@param` with a type and description for each parameter, `@returns`, and a `@category` (Setup, Drawing, Textures, Framebuffers or Lower level). An `@example` helps.
+- Option objects and return values are `@typedef`s, with the description on the `@typedef` line itself (TypeDoc drops a description above it) and a `@property` for each field. Put the default in the description as well as the brackets: TypeDoc doesn't show `[size=1]`.
+- Add each new typedef to the list in `lib/index.js`, which gives it its own page. Typedefs can't take a `@category`, so they all appear under Types.
 
 ## Live examples
 

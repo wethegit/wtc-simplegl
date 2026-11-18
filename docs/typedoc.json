@@ -1,0 +1,65 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "plugin": [
+    "typedoc-plugin-markdown",
+    "typedoc-vitepress-theme"
+  ],
+  "readme": "none",
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "disableSources": false,
+  "gitRevision": "main",
+  "sourceLinkTemplate": "https://github.com/wethegit/wtc-simplegl/blob/{gitRevision}/{path}#L{line}",
+  "outputFileStrategy": "members",
+  "entryFileName": "index",
+  "hidePageHeader": true,
+  "hideBreadcrumbs": true,
+  "useCodeBlocks": true,
+  "parametersFormat": "table",
+  "interfacePropertiesFormat": "table",
+  "classPropertiesFormat": "table",
+  "typeDeclarationFormat": "table",
+  "enumMembersFormat": "table",
+  "propertyMembersFormat": "table",
+  "categorizeByGroup": false,
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": false
+  },
+  "sidebar": {
+    "autoConfiguration": true,
+    "format": "vitepress",
+    "pretty": true,
+    "collapsed": true
+  },
+  "tableColumnSettings": {
+    "hideSources": true,
+    "leftAlignHeaders": true
+  },
+  "pageTitleTemplates": {
+    "member": "{name}"
+  },
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": true
+  },
+  "treatValidationWarningsAsErrors": true,
+  "defaultCategory": "Types",
+  "name": "wtc-simplegl",
+  "entryPoints": [
+    "../lib/index.js"
+  ],
+  "tsconfig": "./tsconfig.api.json",
+  "out": "./api",
+  "docsRoot": "./",
+  "categoryOrder": [
+    "Setup",
+    "Drawing",
+    "Textures",
+    "Framebuffers",
+    "Lower level",
+    "Types"
+  ]
+}
