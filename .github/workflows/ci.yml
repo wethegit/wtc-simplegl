@@ -50,6 +50,39 @@ jobs:
 
       - run: npm ci --prefix docs
 
-      # Fails on dead links
+      # Fails on dead links and undocumented exports
       - name: Build the docs
         run: npm run docs:build
+
+  examples:
+    name: Example smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - run: npm ci --prefix docs
+
+      # Opens every page with a live example in headless Chromium (software
+      # WebGL) and fails on console errors and WebGL warnings
+      - name: Install Chromium
+        working-directory: docs
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the example tests
+        run: npm --prefix docs run test:e2e
+
+      - name: Upload traces
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-traces
+          path: docs/test-results/
+          retention-days: 7

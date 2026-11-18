@@ -6,7 +6,8 @@
     "api": "typedoc",
     "dev": "npm run api && vitepress dev --port 5274 --strictPort",
     "build": "npm run api && vitepress build",
-    "preview": "vitepress preview"
+    "preview": "vitepress preview",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "typedoc": "^0.28.20",

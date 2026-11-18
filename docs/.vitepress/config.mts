@@ -18,7 +18,28 @@ const guide: DefaultTheme.SidebarItem[] = [
     text: 'Getting started',
     items: [
       { text: 'Introduction', link: '/' },
+      { text: 'Installation', link: '/getting-started/installation' },
       { text: 'Your first shader', link: '/getting-started/first-shader' }
+    ]
+  },
+  {
+    text: 'Core concepts',
+    items: [
+      { text: 'Context and canvas', link: '/core/context' },
+      { text: 'The frame loop', link: '/core/loop' },
+      { text: 'Renderers and attributes', link: '/core/renderers' },
+      { text: 'Uniforms', link: '/core/uniforms' },
+      { text: 'Textures', link: '/core/textures' },
+      { text: 'Framebuffers', link: '/core/framebuffers' },
+      { text: 'Transform feedback', link: '/core/transform-feedback' },
+      { text: 'Cleaning up', link: '/core/cleaning-up' }
+    ]
+  },
+  {
+    text: 'Lower level',
+    items: [
+      { text: 'Shaders and programs', link: '/lower-level/shaders-and-programs' },
+      { text: 'Buffers and vertex arrays', link: '/lower-level/buffers-and-vertex-arrays' }
     ]
   }
 ]

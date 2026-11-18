@@ -5,3 +5,5 @@ dist/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
 docs/api/
+docs/test-results/
+docs/playwright-report/
