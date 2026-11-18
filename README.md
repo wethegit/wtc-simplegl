@@ -106,6 +106,21 @@ Each attribute takes `data` (a typed array) or an existing `buffer`, plus `size`
 
 For transform feedback, give an attribute `component: "transformFeedback"` and the name of the vertex shader output that updates it as `varying`. Two copies of its buffer are made and swapped every frame. `mode` must be `gl.POINTS`, `gl.LINES` or `gl.TRIANGLES`.
 
+To draw the results with a different program, give the drawing renderer's attributes `from: simulation`. Each one reads the simulation's output of the same name (or `output: "a_name"`), following it as the buffers swap:
+
+```js
+const simulation = createRenderer(gl, {
+  vert: simulateVertex, frag: emptyFragment, mode: gl.POINTS, count,
+  attributes: { a_position: { data: positions, size: 2, component: "transformFeedback", varying: "v_position" } },
+});
+const particles = createRenderer(gl, {
+  vert, frag, mode: gl.POINTS, count,
+  attributes: { a_position: { from: simulation, size: 2 } },
+});
+```
+
+`simulation.outputs` has the buffers holding the latest output, by attribute name.
+
 The renderer has:
 
 - `bindVAOs()`: uses the program and binds its vertex array. Call before drawing.
@@ -113,6 +128,7 @@ The renderer has:
 - `setUniforms({ name: value, ... })`: `bindUniform` for several uniforms at once. Names the shader doesn't use are skipped, so one object can be shared between renderers.
 - `render({ x, y, width, height }?)`: sets the viewport (the whole canvas by default) and draws.
 - `program`, `uniforms`: the underlying program and its active uniforms.
+- `outputs`: with transform feedback, the buffers holding the latest output.
 
 ### `createFrameBuffer(gl, options)`
 
