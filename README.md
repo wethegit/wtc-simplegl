@@ -109,7 +109,8 @@ For transform feedback, give an attribute `component: "transformFeedback"` and t
 The renderer has:
 
 - `bindVAOs()`: uses the program and binds its vertex array. Call before drawing.
-- `bindUniform(name, value)`: sets a uniform. Numbers, arrays and typed arrays all work; array uniforms can be set by their plain name.
+- `bindUniform(name, value)`: sets a uniform. Numbers, arrays and typed arrays all work; array uniforms can be set by their plain name. For a sampler, pass the texture itself (or a framebuffer target such as `fbo.read`): every sampler has its own texture unit, and its texture is bound when the renderer draws. Passing a unit number instead still works if you bind textures yourself.
+- `setUniforms({ name: value, ... })`: `bindUniform` for several uniforms at once. Names the shader doesn't use are skipped, so one object can be shared between renderers.
 - `render({ x, y, width, height }?)`: sets the viewport (the whole canvas by default) and draws.
 - `program`, `uniforms`: the underlying program and its active uniforms.
 
