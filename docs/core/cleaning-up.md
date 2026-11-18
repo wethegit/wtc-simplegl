@@ -95,4 +95,5 @@ Only do this for a canvas you're discarding. A lost context can't be used again.
 
 ## See also
 
+- [A React component](/cookbook/react)
 - API: [Renderer](/api/interfaces/Renderer), [FrameBuffer](/api/interfaces/FrameBuffer)

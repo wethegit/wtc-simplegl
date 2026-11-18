@@ -48,7 +48,7 @@ feedback.swap()
 // feedback.read now holds the frame just drawn
 ```
 
-Set the texture uniforms every frame: `read` and `write` trade places with each swap.
+Set the texture uniforms every frame: `read` and `write` trade places with each swap. [Feedback with ping-pong buffers](/cookbook/ping-pong) builds a whole effect this way.
 
 ## Options
 

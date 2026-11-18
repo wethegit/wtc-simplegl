@@ -36,6 +36,19 @@ const guide: DefaultTheme.SidebarItem[] = [
     ]
   },
   {
+    text: 'Cookbook',
+    items: [
+      { text: 'Overview', link: '/cookbook/' },
+      { text: 'Feedback with ping-pong buffers', link: '/cookbook/ping-pong' },
+      { text: 'Pointer, time and resolution', link: '/cookbook/pointer-uniforms' },
+      { text: 'An image effect', link: '/cookbook/image-effect' },
+      { text: 'Lookups in a data texture', link: '/cookbook/data-textures' },
+      { text: 'Video and live canvases', link: '/cookbook/live-canvas' },
+      { text: 'Blur resolve', link: '/cookbook/blur-resolve' },
+      { text: 'A React component', link: '/cookbook/react' }
+    ]
+  },
+  {
     text: 'Lower level',
     items: [
       { text: 'Shaders and programs', link: '/lower-level/shaders-and-programs' },

@@ -90,5 +90,6 @@ float random = fract(sin(float(gl_VertexID) * 12.9898 + u_frame * 78.233) * 4375
 
 ## See also
 
+- [Blur resolve](/cookbook/blur-resolve), particles spawned from text
 - [Renderers and attributes](/core/renderers)
 - API: [Attribute](/api/interfaces/Attribute), [Renderer](/api/interfaces/Renderer)

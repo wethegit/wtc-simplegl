@@ -64,4 +64,5 @@ console.log(Object.keys(renderer.uniforms)) // which uniforms survived compilati
 ## See also
 
 - [Textures](/core/textures)
+- [Pointer, time and resolution](/cookbook/pointer-uniforms), for the uniforms most effects use
 - API: [Renderer](/api/interfaces/Renderer), [ActiveUniform](/api/interfaces/ActiveUniform)

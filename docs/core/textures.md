@@ -91,4 +91,5 @@ Textures are plain `WebGLTexture`s, so free them with `gl.deleteTexture(texture)
 ## See also
 
 - [Framebuffers](/core/framebuffers), to draw into a texture
+- [Lookups in a data texture](/cookbook/data-textures) and [Video and live canvases](/cookbook/live-canvas)
 - API: [createTexture](/api/functions/createTexture), [loadTexture](/api/functions/loadTexture), [updateTexture](/api/functions/updateTexture), [TextureOptions](/api/interfaces/TextureOptions)
