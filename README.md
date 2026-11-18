@@ -84,9 +84,9 @@ Returns a WebGL2 context and keeps the canvas's pixel size in step with its CSS 
 | `autoResize` | `true` | Resize when the canvas's CSS size changes. |
 | `onResize` | | `(width, height, gl) => {}`, called on creation and after every resize. |
 | `attributes` | | Passed to `getContext`. |
-| `signal` | | An `AbortSignal` that stops the resizing. |
+| `signal` | | An `AbortSignal` that stops the resizing and removes the canvas if `createContext` made it. |
 
-### `loop(fn, { autoStart = true }?)`
+### `loop(fn, { autoStart = true, signal }?)`
 
 Calls `fn(time, delta, frame)` every animation frame, with `time` and `delta` in seconds. `time` doesn't advance while stopped. Returns `{ start(), stop(), running }`.
 
@@ -129,6 +129,7 @@ The renderer has:
 - `render({ x, y, width, height }?)`: sets the viewport (the whole canvas by default) and draws.
 - `program`, `uniforms`: the underlying program and its active uniforms.
 - `outputs`: with transform feedback, the buffers holding the latest output.
+- `delete()`: frees the program, vertex arrays and the buffers made from attribute `data`. The renderer does nothing afterwards.
 
 ### `createFrameBuffer(gl, options)`
 
@@ -146,7 +147,7 @@ Creates an offscreen render target, or a `read`/`write` pair for ping-pong effec
 | `tiling` | `gl.CLAMP_TO_EDGE` | Wrap mode. |
 | `mips` | `false` | Generate mipmaps. |
 
-It has `swap()` to flip `read` and `write`, and `resize(width, height)`.
+It has `swap()` to flip `read` and `write`, `resize(width, height)`, and `delete()`.
 
 ### `createTexture(gl, options)`, `loadTexture(gl, url, options?)`, `updateTexture(gl, texture, source, options?)`
 
@@ -170,13 +171,42 @@ const positions = createTexture(gl, { data, width: 1024, height: rows, format: g
 | `wrapS`, `wrapT` | `gl.CLAMP_TO_EDGE` | |
 | `level` | `0` | |
 
-`loadTexture` loads an image from a URL and resolves with a texture, taking the same options.
+`loadTexture` loads an image from a URL and resolves with a texture, taking the same options plus `signal`: if that's aborted first, no texture is made and the promise rejects.
 
 `updateTexture` uploads new contents: an image source, such as the current frame of a video, or a typed array with `width` and `height`. Pass the same `type`, `format` and `flipY` the texture was made with.
 
 ### Lower level
 
 `compileShader`, `createProgram`, `linkProgram`, `createBuffer`, `createVertexArray` and `getActiveUniforms` are the pieces `createRenderer` is built from, for when you want more control.
+
+## Cleaning up
+
+Everything that holds GPU memory can be freed: `renderer.delete()`, `framebuffer.delete()`, and `gl.deleteTexture(texture)` for textures. `createContext`, `loop` and `loadTexture` take an `AbortSignal`.
+
+In React, create everything in an effect and free it in the cleanup:
+
+```jsx
+function Effect() {
+  const ref = useRef();
+  useEffect(() => {
+    const ac = new AbortController();
+    const gl = createContext({ canvas: ref.current, signal: ac.signal });
+    const quad = createRenderer(gl, { vert, frag, attributes, count: 3 });
+    loop((time) => {
+      quad.bindVAOs();
+      quad.setUniforms({ u_time: time, u_resolution: [gl.canvas.width, gl.canvas.height] });
+      quad.render();
+    }, { signal: ac.signal });
+    return () => {
+      ac.abort();
+      quad.delete();
+    };
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "100%" }} />;
+}
+```
+
+This is safe under StrictMode, which runs the effect, cleans it up and runs it again: the canvas keeps its context, and `getContext` hands the same one back.
 
 ## Development
 
