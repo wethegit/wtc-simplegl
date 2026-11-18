@@ -1,8 +1,10 @@
 # wtc-simplegl
 
-A small WebGL2 helper library. It takes care of the boilerplate (compiling and linking shaders, vertex arrays, uniforms, framebuffers, textures, canvas sizing) and otherwise stays out of the way: you still write GLSL and plain `gl` calls.
+A small WebGL2 helper library. It takes care of the boilerplate (compiling and linking shaders, vertex arrays, uniforms, textures, framebuffers, canvas sizing, cleaning up) and otherwise stays out of the way: you still write GLSL and plain `gl` calls.
 
 It's built to work where you can't install packages. The whole library is one file you can copy into a project.
+
+**[Documentation](https://wethegit.github.io/wtc-simplegl/)**: guides, a cookbook of live examples, and the API reference.
 
 WebGL2 only: every function expects a context from `canvas.getContext("webgl2")`.
 
@@ -35,7 +37,7 @@ import { createContext, createRenderer, loop } from "wtc-simplegl";
 
 ## Quick start
 
-A fullscreen canvas with an animated fragment shader:
+A full-window canvas with an animated fragment shader:
 
 ```js
 import { createContext, createRenderer, loop } from "./simplegl.js";
@@ -50,13 +52,13 @@ void main() { gl_Position = vec4(a_position, 0, 1); }`,
 precision highp float;
 uniform vec2 u_resolution;
 uniform float u_time;
-out vec4 color;
+out vec4 colour;
 void main() {
   vec2 uv = gl_FragCoord.xy / u_resolution;
-  color = vec4(uv, 0.5 + 0.5 * sin(u_time), 1);
+  colour = vec4(uv, 0.5 + 0.5 * sin(u_time), 1);
 }`,
   attributes: {
-    // One triangle that covers the screen.
+    // One triangle that covers the screen
     a_position: { data: new Float32Array([-1, -1, 3, -1, -1, 3]), size: 2 },
   },
   count: 3,
@@ -64,152 +66,26 @@ void main() {
 
 loop((time) => {
   quad.bindVAOs();
-  quad.bindUniform("u_resolution", [gl.canvas.width, gl.canvas.height]);
-  quad.bindUniform("u_time", time);
+  quad.setUniforms({ u_resolution: [gl.canvas.width, gl.canvas.height], u_time: time });
   quad.render();
 });
 ```
 
-## API
+[Your first shader](https://wethegit.github.io/wtc-simplegl/getting-started/first-shader) walks through it.
 
-### `createContext(options?)`
+## What's in it
 
-Returns a WebGL2 context and keeps the canvas's pixel size in step with its CSS size and the device pixel ratio. With no options it creates a canvas that fills the window.
-
-| Option | Default | |
-|---|---|---|
-| `canvas` | new canvas | Use an existing canvas; size it with CSS. |
-| `container` | `document.body` | Where a new canvas is appended. |
-| `dpr` | `devicePixelRatio`, max 2 | A fixed pixel ratio. |
-| `autoResize` | `true` | Resize when the canvas's CSS size changes. |
-| `onResize` | | `(width, height, gl) => {}`, called on creation and after every resize. |
-| `attributes` | | Passed to `getContext`. |
-| `signal` | | An `AbortSignal` that stops the resizing and removes the canvas if `createContext` made it. |
-
-### `loop(fn, { autoStart = true, signal }?)`
-
-Calls `fn(time, delta, frame)` every animation frame, with `time` and `delta` in seconds. `time` doesn't advance while stopped. Returns `{ start(), stop(), running }`.
-
-### `createRenderer(gl, options)`
-
-Compiles and links a program, sets up its vertex array and looks up its uniforms.
-
-| Option | Default | |
-|---|---|---|
-| `vert`, `frag` | | GLSL ES 3.00 source (`#version 300 es`). |
-| `attributes` | `{}` | Attribute definitions, by name. See below. |
-| `count` | | Number of vertices to draw. |
-| `offset` | `0` | First vertex to draw. |
-| `mode` | `gl.TRIANGLES` | Primitive type. |
-
-Each attribute takes `data` (a typed array) or an existing `buffer`, plus `size`, `type`, `normalize`, `stride`, `offset`, `usage` and `index` (its location), which default to WebGL's usual values. Set `buffertype: gl.ELEMENT_ARRAY_BUFFER` for an index buffer.
-
-For transform feedback, give an attribute `component: "transformFeedback"` and the name of the vertex shader output that updates it as `varying`. Two copies of its buffer are made and swapped every frame. `mode` must be `gl.POINTS`, `gl.LINES` or `gl.TRIANGLES`.
-
-To draw the results with a different program, give the drawing renderer's attributes `from: simulation`. Each one reads the simulation's output of the same name (or `output: "a_name"`), following it as the buffers swap:
-
-```js
-const simulation = createRenderer(gl, {
-  vert: simulateVertex, frag: emptyFragment, mode: gl.POINTS, count,
-  attributes: { a_position: { data: positions, size: 2, component: "transformFeedback", varying: "v_position" } },
-});
-const particles = createRenderer(gl, {
-  vert, frag, mode: gl.POINTS, count,
-  attributes: { a_position: { from: simulation, size: 2 } },
-});
-```
-
-`simulation.outputs` has the buffers holding the latest output, by attribute name.
-
-The renderer has:
-
-- `bindVAOs()`: uses the program and binds its vertex array. Call before drawing.
-- `bindUniform(name, value)`: sets a uniform. Numbers, arrays and typed arrays all work; array uniforms can be set by their plain name. For a sampler, pass the texture itself (or a framebuffer target such as `fbo.read`): every sampler has its own texture unit, and its texture is bound when the renderer draws. Passing a unit number instead still works if you bind textures yourself.
-- `setUniforms({ name: value, ... })`: `bindUniform` for several uniforms at once. Names the shader doesn't use are skipped, so one object can be shared between renderers.
-- `render({ x, y, width, height }?)`: sets the viewport (the whole canvas by default) and draws.
-- `program`, `uniforms`: the underlying program and its active uniforms.
-- `outputs`: with transform feedback, the buffers holding the latest output.
-- `delete()`: frees the program, vertex arrays and the buffers made from attribute `data`. The renderer does nothing afterwards.
-
-### `createFrameBuffer(gl, options)`
-
-Creates an offscreen render target, or a `read`/`write` pair for ping-pong effects. Each target is `{ fb, targetTexture, depthBuffer }`.
-
-| Option | Default | |
-|---|---|---|
-| `width`, `height` | | Size in pixels. |
-| `type` | `gl.UNSIGNED_BYTE` | `gl.FLOAT` or `gl.HALF_FLOAT` for float targets. |
-| `format`, `internalFormat` | `gl.RGBA` | The internal format is picked for float types. |
-| `data` | `null` | Initial pixels. |
-| `singular` | `false` | Only create `read`. |
-| `depth` | `false` | Add a depth buffer. |
-| `minFilter`, `magFilter` | `gl.LINEAR` | |
-| `tiling` | `gl.CLAMP_TO_EDGE` | Wrap mode. |
-| `mips` | `false` | Generate mipmaps. |
-
-It has `swap()` to flip `read` and `write`, `resize(width, height)`, and `delete()`.
-
-### `createTexture(gl, options)`, `loadTexture(gl, url, options?)`, `updateTexture(gl, texture, source, options?)`
-
-`createTexture` makes a 2D texture from either:
-
-- `img`: an image, canvas, video or `ImageBitmap` that has already loaded, or
-- `width` and `height`, with optional `data` (a typed array). Leave `data` out for an empty texture.
-
-```js
-// Two floats per texel, read with texelFetch
-const positions = createTexture(gl, { data, width: 1024, height: rows, format: gl.RG, type: gl.FLOAT });
-```
-
-| Option | Default | |
-|---|---|---|
-| `type`, `format` | `gl.UNSIGNED_BYTE`, `gl.RGBA` | |
-| `internalFormat` | `format` | A sized format (e.g. `gl.RG32F`) is picked for `gl.FLOAT` and `gl.HALF_FLOAT`. |
-| `flipY` | `false` | Flip on upload, so the top of an image is at texture coordinate y = 1. |
-| `generateMips` | `true` for `gl.UNSIGNED_BYTE` | |
-| `minFilter`, `magFilter` | `gl.LINEAR` | Trilinear with mips; `gl.NEAREST` for 32-bit float where linear filtering isn't supported. |
-| `wrapS`, `wrapT` | `gl.CLAMP_TO_EDGE` | |
-| `level` | `0` | |
-
-`loadTexture` loads an image from a URL and resolves with a texture, taking the same options plus `signal`: if that's aborted first, no texture is made and the promise rejects.
-
-`updateTexture` uploads new contents: an image source, such as the current frame of a video, or a typed array with `width` and `height`. Pass the same `type`, `format` and `flipY` the texture was made with.
-
-### Lower level
-
-`compileShader`, `createProgram`, `linkProgram`, `createBuffer`, `createVertexArray` and `getActiveUniforms` are the pieces `createRenderer` is built from, for when you want more control.
-
-## Cleaning up
-
-Everything that holds GPU memory can be freed: `renderer.delete()`, `framebuffer.delete()`, and `gl.deleteTexture(texture)` for textures. `createContext`, `loop` and `loadTexture` take an `AbortSignal`.
-
-In React, create everything in an effect and free it in the cleanup:
-
-```jsx
-function Effect() {
-  const ref = useRef();
-  useEffect(() => {
-    const ac = new AbortController();
-    const gl = createContext({ canvas: ref.current, signal: ac.signal });
-    const quad = createRenderer(gl, { vert, frag, attributes, count: 3 });
-    loop((time) => {
-      quad.bindVAOs();
-      quad.setUniforms({ u_time: time, u_resolution: [gl.canvas.width, gl.canvas.height] });
-      quad.render();
-    }, { signal: ac.signal });
-    return () => {
-      ac.abort();
-      quad.delete();
-    };
-  }, []);
-  return <canvas ref={ref} style={{ width: "100%", height: "100%" }} />;
-}
-```
-
-This is safe under StrictMode, which runs the effect, cleans it up and runs it again: the canvas keeps its context, and `getContext` hands the same one back.
+- `createContext` and `loop`: a WebGL2 context that keeps the canvas sized to the page, and a frame loop.
+- `createRenderer`: a program, its vertex array and uniforms, with `setUniforms` for numbers, arrays and textures alike.
+- `createTexture`, `loadTexture`, `updateTexture`: textures from images, canvases, video and typed arrays.
+- `createFrameBuffer`: framebuffers, ping-pong pairs, float targets and depth.
+- Transform feedback, for simulating on the GPU and drawing the results with another renderer.
+- `delete()` and `AbortSignal` support throughout, for React and other places effects come and go.
 
 ## Development
 
 `lib/` holds the source, one function per file. `npm run build` joins it into `dist/simplegl.js`; the build runs automatically when the package is packed, so `dist/` isn't committed.
+
+The documentation is in `docs/`, with its own `package.json`. Run `npm ci --prefix docs` once, then `npm run docs:dev`. [docs/README.md](docs/README.md) covers writing pages, live examples and the JSDoc the API reference needs.
 
 Releases use [Changesets](https://github.com/changesets/changesets). Add a changeset with `npx changeset` in any PR that changes `lib/`. Merging to `main` opens a "Version Packages" PR, and merging that publishes to npm and attaches `simplegl.js` to the GitHub release.
