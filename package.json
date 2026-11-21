@@ -1,6 +1,6 @@
 {
   "name": "wtc-simplegl",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "A small WebGL2 helper library that cuts down boilerplate, usable from npm or as a single copy-paste file.",
   "type": "module",
   "main": "lib/index.js",
