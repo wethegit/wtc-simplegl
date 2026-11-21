@@ -1,0 +1,14 @@
+{
+  "//": "Lets TypeDoc read the library's JavaScript and JSDoc types.",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "target": "es2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["es2022", "dom"],
+    "skipLibCheck": true
+  },
+  "include": ["../lib/**/*.js"]
+}
