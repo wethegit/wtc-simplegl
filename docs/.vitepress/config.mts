@@ -20,6 +20,7 @@ const guide: DefaultTheme.SidebarItem[] = [
       { text: "Introduction", link: "/" },
       { text: "Installation", link: "/getting-started/installation" },
       { text: "Your first shader", link: "/getting-started/first-shader" },
+      { text: "Using with AI agents", link: "/getting-started/ai-agents" },
     ],
   },
   {
