@@ -9,5 +9,4 @@ Every recipe runs live on its page, with its source underneath. They're written 
 - **[An image effect](/cookbook/image-effect).** Load an image, scale it to cover the canvas, and ripple it around the pointer.
 - **[Lookups in a data texture](/cookbook/data-textures).** Send an array of points to the shader as a float texture, and read it back with `texelFetch`.
 - **[Video and live canvases](/cookbook/live-canvas).** Use a video, or a 2D canvas you draw on, as a texture that changes every frame.
-- **[Blur resolve](/cookbook/blur-resolve).** Text that comes into focus letter by letter, shedding particles, and blurs where the pointer passes. A larger effect, with a blur pyramid, a ping-pong field and transform feedback particles.
 - **[A React component](/cookbook/react).** Any of these, as a component that cleans up after itself.

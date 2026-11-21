@@ -7,50 +7,57 @@ Every example in these docs has the same shape: a function that takes an element
 ## The component
 
 ```jsx
-import { useEffect, useRef } from 'react'
-import { createContext, createRenderer, loop } from 'wtc-simplegl'
+import { useEffect, useRef } from "react";
+import { createContext, createRenderer, loop } from "wtc-simplegl";
 
 const vert = /* glsl */ `#version 300 es
 in vec2 a_position;
-void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`
+void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
 
 export function Shader({ frag, uniforms }) {
-  const canvas = useRef(null)
+  const canvas = useRef(null);
   // Read the latest uniforms each frame without restarting the effect
-  const latest = useRef(uniforms)
-  latest.current = uniforms
+  const latest = useRef(uniforms);
+  latest.current = uniforms;
 
   useEffect(() => {
-    const controller = new AbortController()
-    const { signal } = controller
-    const gl = createContext({ canvas: canvas.current, signal })
+    const controller = new AbortController();
+    const { signal } = controller;
+    const gl = createContext({ canvas: canvas.current, signal });
     const quad = createRenderer(gl, {
       vert,
       frag,
-      attributes: { a_position: { data: new Float32Array([-1, -1, 3, -1, -1, 3]), size: 2 } },
-      count: 3
-    })
+      attributes: {
+        a_position: { data: new Float32Array([-1, -1, 3, -1, -1, 3]), size: 2 },
+      },
+      count: 3,
+    });
 
     loop(
       (time) => {
-        quad.bindVAOs()
+        quad.bindVAOs();
         quad.setUniforms({
           u_time: time,
           u_resolution: [gl.canvas.width, gl.canvas.height],
-          ...latest.current
-        })
-        quad.render()
+          ...latest.current,
+        });
+        quad.render();
       },
-      { signal }
-    )
+      { signal },
+    );
 
     return () => {
-      controller.abort()
-      quad.delete()
-    }
-  }, [frag])
+      controller.abort();
+      quad.delete();
+    };
+  }, [frag]);
 
-  return <canvas ref={canvas} style={{ display: 'block', width: '100%', height: '100%' }} />
+  return (
+    <canvas
+      ref={canvas}
+      style={{ display: "block", width: "100%", height: "100%" }}
+    />
+  );
 }
 ```
 
@@ -68,17 +75,17 @@ export function Shader({ frag, uniforms }) {
 
 ## Larger effects
 
-For something with more moving parts, write the effect as a plain module, as the [Blur resolve](/cookbook/blur-resolve) recipe does, with a function that takes a canvas and returns `frame` and `destroy`. The component then only connects it:
+For something with more moving parts, write the effect as a plain module, as the recipe does, with a function that takes a canvas and returns `frame` and `destroy`. The component then only connects it:
 
 ```jsx
 useEffect(() => {
-  const effect = createBlurResolve({ canvas: canvas.current, params, font })
-  const animation = loop((time, delta) => effect.frame(time, delta))
+  const effect = createBlurResolve({ canvas: canvas.current, params, font });
+  const animation = loop((time, delta) => effect.frame(time, delta));
   return () => {
-    animation.stop()
-    effect.destroy()
-  }
-}, [])
+    animation.stop();
+    effect.destroy();
+  };
+}, []);
 ```
 
 Keeping the WebGL out of the component also makes it usable outside React: the docs' examples, a CodePen, or a plain page.
@@ -88,12 +95,12 @@ Keeping the WebGL out of the component also makes it usable outside React: the d
 Effects below the fold don't need to draw. Stop the loop while the canvas is out of view:
 
 ```js
-const animation = loop(draw, { signal })
+const animation = loop(draw, { signal });
 const observer = new IntersectionObserver(([entry]) =>
-  entry.isIntersecting ? animation.start() : animation.stop()
-)
-observer.observe(canvas.current)
-signal.addEventListener('abort', () => observer.disconnect())
+  entry.isIntersecting ? animation.start() : animation.stop(),
+);
+observer.observe(canvas.current);
+signal.addEventListener("abort", () => observer.disconnect());
 ```
 
 ## See also

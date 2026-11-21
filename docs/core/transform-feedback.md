@@ -19,10 +19,22 @@ const simulation = createRenderer(gl, {
   mode: gl.POINTS,
   count,
   attributes: {
-    a_position: { data: positions, size: 2, component: 'transformFeedback', varying: 'v_position', usage: gl.DYNAMIC_COPY },
-    a_velocity: { data: velocities, size: 2, component: 'transformFeedback', varying: 'v_velocity', usage: gl.DYNAMIC_COPY }
-  }
-})
+    a_position: {
+      data: positions,
+      size: 2,
+      component: "transformFeedback",
+      varying: "v_position",
+      usage: gl.DYNAMIC_COPY,
+    },
+    a_velocity: {
+      data: velocities,
+      size: 2,
+      component: "transformFeedback",
+      varying: "v_velocity",
+      usage: gl.DYNAMIC_COPY,
+    },
+  },
+});
 ```
 
 ```glsl
@@ -41,11 +53,11 @@ Every transform feedback attribute gets two buffers from its `data`. Each frame 
 Turn the rasteriser off while stepping, so the simulation's points aren't drawn:
 
 ```js
-gl.enable(gl.RASTERIZER_DISCARD)
-simulation.bindVAOs()
-simulation.setUniforms({ u_delta: delta })
-simulation.render()
-gl.disable(gl.RASTERIZER_DISCARD)
+gl.enable(gl.RASTERIZER_DISCARD);
+simulation.bindVAOs();
+simulation.setUniforms({ u_delta: delta });
+simulation.render();
+gl.disable(gl.RASTERIZER_DISCARD);
 ```
 
 Or leave it on, and give the simulation a fragment shader that draws the particles too. Separate programs keep each shader simpler.
@@ -62,9 +74,9 @@ const particles = createRenderer(gl, {
   count,
   attributes: {
     a_position: { from: simulation, size: 2 },
-    a_velocity: { from: simulation, size: 2 }
-  }
-})
+    a_velocity: { from: simulation, size: 2 },
+  },
+});
 ```
 
 Use `output` when the names differ: `a_centre: { from: simulation, output: 'a_position', size: 2 }`.
@@ -74,10 +86,10 @@ Use `output` when the names differ: `a_centre: { from: simulation, output: 'a_po
 `simulation.outputs` holds the buffers with the latest output, by attribute name. To read one back in JavaScript, which is slow and worth avoiding every frame:
 
 ```js
-const values = new Float32Array(count * 2)
-gl.bindBuffer(gl.ARRAY_BUFFER, simulation.outputs.a_position)
-gl.getBufferSubData(gl.ARRAY_BUFFER, 0, values)
-gl.bindBuffer(gl.ARRAY_BUFFER, null)
+const values = new Float32Array(count * 2);
+gl.bindBuffer(gl.ARRAY_BUFFER, simulation.outputs.a_position);
+gl.getBufferSubData(gl.ARRAY_BUFFER, 0, values);
+gl.bindBuffer(gl.ARRAY_BUFFER, null);
 ```
 
 ## Randomness
@@ -90,6 +102,5 @@ float random = fract(sin(float(gl_VertexID) * 12.9898 + u_frame * 78.233) * 4375
 
 ## See also
 
-- [Blur resolve](/cookbook/blur-resolve), particles spawned from text
 - [Renderers and attributes](/core/renderers)
 - API: [Attribute](/api/interfaces/Attribute), [Renderer](/api/interfaces/Renderer)
