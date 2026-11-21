@@ -4,7 +4,7 @@ A small WebGL2 helper library. It takes care of the boilerplate (compiling and l
 
 It's built to work where you can't install packages. The whole library is one file you can copy into a project.
 
-**[Documentation](https://wethegit.github.io/wtc-simplegl/)**: guides, a cookbook of live examples, and the API reference.
+**[Documentation](https://wethegit.github.io/wtc-simplegl/)**: guides, a cookbook of live examples, and the API reference. There's also an [agent skill](https://wethegit.github.io/wtc-simplegl/getting-started/ai-agents) for Claude and other coding agents.
 
 WebGL2 only: every function expects a context from `canvas.getContext("webgl2")`.
 

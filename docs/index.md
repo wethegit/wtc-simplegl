@@ -58,3 +58,5 @@ loop((time) => {
 ```
 
 Start with [installation](/getting-started/installation), then [your first shader](/getting-started/first-shader).
+
+Working with an AI coding agent? Give it the [wtc-simplegl skill](/getting-started/ai-agents).

@@ -86,3 +86,9 @@ Show it on a page with its source under it:
 - `createContext` keeps the canvas sized, so `resize(width, height)` is optional. Use it for anything else that depends on the size, such as framebuffers.
 - Keep the canvas see-through as above, and write premultiplied colour (`vec4(rgb * alpha, alpha)`), since the panel follows the light and dark themes.
 - `examples/first-shader.js` is a working example.
+
+## The agent skill
+
+The skill for Claude and other coding agents lives in `skills/wtc-simplegl/` at the repo root, not in `docs/`. `npm run skill`, which `dev` and `build` run first, copies it into `public/skill/` with a zip for uploading. That folder isn't committed. `getting-started/ai-agents.md` includes `SKILL.md` directly, so the page always matches it.
+
+When the API changes, update the skill in the same PR: the options and gotchas in `SKILL.md`, the reference file for the area, and the version note at the top.
